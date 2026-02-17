@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker — Mojammil Ansari</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="app-logo">
+        <span class="logo-icon">₹</span>
+        <div>
+          <div class="app-name">Expenzo</div>
+          <div class="app-tagline">Personal Finance</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
+          <span class="nav-icon">◈</span> Dashboard
+        </button>
+        <button class="nav-btn" data-view="expenses" onclick="switchView('expenses')">
+          <span class="nav-icon">≡</span> All Expenses
+        </button>
+        <button class="nav-btn" data-view="monthly" onclick="switchView('monthly')">
+          <span class="nav-icon">◷</span> Monthly View
+        </button>
+        <button class="nav-btn" data-view="categories" onclick="switchView('categories')">
+          <span class="nav-icon">◉</span> Categories
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="creator-card">
+        <div class="creator-avatar">MA</div>
+        <div class="creator-info">
+          <div class="creator-name">Mojammil Ansari</div>
+          <div class="creator-contact">mojammilansari820@gmail.com</div>
+          <div class="creator-contact">+91 7644067426</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main">
+
+    <!-- ---- DASHBOARD VIEW ---- -->
+    <div id="view-dashboard" class="view active">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub" id="today-date"></p>
+        </div>
+        <button class="btn-add" onclick="openModal()">+ Add Expense</button>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-grid">
+        <div class="summary-card summary-total">
+          <div class="summary-label">Total Spent</div>
+          <div class="summary-amount" id="dash-total">₹0.00</div>
+          <div class="summary-meta" id="dash-count">0 transactions</div>
+        </div>
+        <div class="summary-card summary-month">
+          <div class="summary-label">This Month</div>
+          <div class="summary-amount" id="dash-month">₹0.00</div>
+          <div class="summary-meta" id="dash-month-count">0 this month</div>
+        </div>
+        <div class="summary-card summary-top">
+          <div class="summary-label">Top Category</div>
+          <div class="summary-amount summary-amount-sm" id="dash-top-cat">—</div>
+          <div class="summary-meta" id="dash-top-amt">No data yet</div>
+        </div>
+        <div class="summary-card summary-avg">
+          <div class="summary-label">Daily Average</div>
+          <div class="summary-amount" id="dash-avg">₹0.00</div>
+          <div class="summary-meta">based on all entries</div>
+        </div>
+      </div>
+
+      <!-- Recent + Category breakdown -->
+      <div class="dash-two-col">
+
+        <!-- Recent Transactions -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Recent Transactions</span>
+            <button class="link-btn" onclick="switchView('expenses')">View all →</button>
+          </div>
+          <div id="recent-list">
+            <div class="empty-msg">No expenses yet. Add one!</div>
+          </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Category Breakdown</span>
+          </div>
+          <div id="cat-breakdown">
+            <div class="empty-msg">No data yet.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ---- ALL EXPENSES VIEW ---- -->
+    <div id="view-expenses" class="view">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">All Expenses</h1>
+          <p class="page-sub">Manage your complete expense history</p>
+        </div>
+        <button class="btn-add" onclick="openModal()">+ Add Expense</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Search</label>
+          <input type="text" id="search-input" placeholder="Search description..." oninput="renderExpenses()" />
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select id="filter-cat" onchange="renderExpenses()">
+            <option value="">All Categories</option>
+            <option value="Food">🍔 Food</option>
+            <option value="Travel">✈️ Travel</option>
+            <option value="Rent">🏠 Rent</option>
+            <option value="Study">📚 Study</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Health">💊 Health</option>
+            <option value="Entertainment">🎮 Entertainment</option>
+            <option value="Bills">⚡ Bills</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>From</label>
+          <input type="date" id="filter-from" onchange="renderExpenses()" />
+        </div>
+        <div class="filter-group">
+          <label>To</label>
+          <input type="date" id="filter-to" onchange="renderExpenses()" />
+        </div>
+        <button class="btn-clear-filter" onclick="clearFilters()">✕ Clear</button>
+      </div>
+
+      <div class="expense-table-wrap">
+        <table class="expense-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expense-tbody">
+            <tr><td colspan="5" class="empty-td">No expenses found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="expense-count-label">0 records</span>
+        <span class="table-total">Filtered Total: <strong id="filtered-total">₹0.00</strong></span>
+      </div>
+
+    </div>
+
+    <!-- ---- MONTHLY VIEW ---- -->
+    <div id="view-monthly" class="view">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Monthly View</h1>
+          <p class="page-sub">Track your spending month by month</p>
+        </div>
+        <div class="month-nav">
+          <button class="month-nav-btn" onclick="prevMonth()">‹</button>
+          <span id="month-label">Month Year</span>
+          <button class="month-nav-btn" onclick="nextMonth()">›</button>
+        </div>
+      </div>
+
+      <!-- Month Summary -->
+      <div class="month-summary-row">
+        <div class="month-stat">
+          <div class="month-stat-label">Total Spent</div>
+          <div class="month-stat-val" id="m-total">₹0.00</div>
+        </div>
+        <div class="month-stat">
+          <div class="month-stat-label">Transactions</div>
+          <div class="month-stat-val" id="m-count">0</div>
+        </div>
+        <div class="month-stat">
+          <div class="month-stat-label">Daily Average</div>
+          <div class="month-stat-val" id="m-avg">₹0.00</div>
+        </div>
+        <div class="month-stat">
+          <div class="month-stat-label">Highest Day</div>
+          <div class="month-stat-val" id="m-max-day">—</div>
+        </div>
+      </div>
+
+      <!-- Category bars for month -->
+      <div class="panel" style="margin-bottom:24px">
+        <div class="panel-head"><span class="panel-title">Spending by Category</span></div>
+        <div id="monthly-cat-bars">
+          <div class="empty-msg">No data for this month.</div>
+        </div>
+      </div>
+
+      <!-- Monthly expense list -->
+      <div class="panel">
+        <div class="panel-head"><span class="panel-title">Transactions This Month</span></div>
+        <div id="monthly-expense-list">
+          <div class="empty-msg">No expenses this month.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---- CATEGORIES VIEW ---- -->
+    <div id="view-categories" class="view">
+
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Category Analysis</h1>
+          <p class="page-sub">See where your money goes</p>
+        </div>
+      </div>
+
+      <div class="cat-grid" id="cat-grid">
+        <div class="empty-msg">Add some expenses to see category analysis.</div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ===== ADD / EDIT MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add Expense</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id" />
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Description <span class="req">*</span></label>
+            <input type="text" id="f-desc" placeholder="e.g. Lunch at canteen" />
+          </div>
+          <div class="form-group">
+            <label>Amount (₹) <span class="req">*</span></label>
+            <input type="number" id="f-amount" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category <span class="req">*</span></label>
+            <select id="f-cat">
+              <option value="">Select category</option>
+              <option value="Food">🍔 Food</option>
+              <option value="Travel">✈️ Travel</option>
+              <option value="Rent">🏠 Rent</option>
+              <option value="Study">📚 Study</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Health">💊 Health</option>
+              <option value="Entertainment">🎮 Entertainment</option>
+              <option value="Bills">⚡ Bills</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date <span class="req">*</span></label>
+            <input type="date" id="f-date" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Note (optional)</label>
+          <input type="text" id="f-note" placeholder="Any additional note..." />
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-modal-save" onclick="saveExpense()">
+            <span id="modal-btn-label">Save Expense</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
